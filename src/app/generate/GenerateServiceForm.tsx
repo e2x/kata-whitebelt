@@ -1,20 +1,7 @@
-import {DragEvent, useEffect, useRef, useState} from "react";
+import {ChangeEvent, DragEvent, useEffect, useRef, useState} from "react";
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import classNames from "@/utils/Utils";
-
-enum GenerationType {
-  FE = "fe",
-  BE = "be",
-  LAMBDA = "lambda"
-}
-
-type ServiceState = {
-  serviceName: string,
-  serviceSpecification: string,
-  serviceTargetName: string,
-  serviceGenerationType: GenerationType,
-  uploadedYaml: string
-}
+import {GenerationType, ServiceState} from "@/types";
 
 export const GenerateServiceForm = () => {
   const [state, setState] = useState({} as ServiceState)
@@ -50,16 +37,44 @@ export const GenerateServiceForm = () => {
       // at least one file has been dropped so do something
       // handleFiles(e.dataTransfer.files);
       console.log(e.dataTransfer.files)
-      e.dataTransfer.files[0].text().then((text) => {
-        setState({...state, uploadedYaml: text})
-      })
+      storeFile(e.dataTransfer.files[0])
     }
   };
 
   const handleGenerate = () => {
     console.log(`Generating ${JSON.stringify(state)}`)
-    generateService(state).then((json) => {
-      console.log(json);
+    generateService(state).then(({blob, headers}) => {
+      const contentDisposition = headers.get('Content-Disposition') || ''
+      const filename = state.serviceName.toLowerCase() + ".zip"
+      console.log(filename)
+      const newBlob = new Blob([blob])
+      const newUrl = window.URL.createObjectURL(newBlob)
+
+      const link = document.createElement(('a'))
+      link.href = newUrl
+      link.setAttribute('download', filename)
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+
+      window.URL.revokeObjectURL(newUrl);
+    })
+  }
+
+  const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!e.target.files) {
+      return;
+    }
+
+    // handle the input...
+    storeFile(e.target.files[0])
+  }
+
+  const storeFile = (file: File) => {
+    file.text().then((text) => {
+      setState({...state, uploadedYaml: text})
     })
   }
 
@@ -71,7 +86,7 @@ export const GenerateServiceForm = () => {
               <div className="px-4 bg-gray-200 sm:px-0">
                 <h3 className="text-lg font-medium leading-6 text-gray-900">Service Information</h3>
                 <p className="mt-1 text-sm text-gray-600">
-                  Provide the sevrice meta information and the specification in preparation for generation.
+                  Provide the service meta information and the specification in preparation for generation.
                 </p>
               </div>
             </div>
@@ -83,7 +98,7 @@ export const GenerateServiceForm = () => {
                 <div className="shadow sm:overflow-hidden sm:rounded-md">
                   <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
                     <div className="grid grid-cols-3 gap-6">
-                      <div className="col-span-3 sm:col-span-2">
+                      <div className="col-span-3">
                         <label htmlFor="service-name" className="block text-sm font-medium text-gray-700">
                           Service Name
                         </label>
@@ -103,7 +118,7 @@ export const GenerateServiceForm = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="sm:col-span-3">
+                    <div className="sm:col-span-2">
                       <label htmlFor="generation-type" className="block text-sm font-medium text-gray-700">
                         Generation Type
                       </label>
@@ -151,11 +166,11 @@ export const GenerateServiceForm = () => {
                                 className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                             >
                               <span>Upload a file</span>
-                              <input ref={inputRef} id="file-upload" name="file-upload" type="file" className="sr-only" />
+                              <input ref={inputRef} id="file-upload" name="file-upload" type="file" className="sr-only" onChange={(ev) => handleFile(ev)}/>
                             </label>
                             <p className="pl-1">or drag and drop</p>
                           </div>
-                          <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                          <p className="text-xs text-gray-500">OpenAPI YAML up to 10MB</p>
                         </div>
                       </div>
                       { dragActive && <div id="drag-file-element"></div> }
@@ -207,7 +222,9 @@ async function generateService(state: ServiceState) {
     body: JSON.stringify(payload),
   })
 
-  return await res.blob();
+  const blob = await res.blob()
+  res.headers.forEach(h => console.log(JSON.stringify(h)))
+  return {blob, headers: res.headers};
 }
 
 export default GenerateServiceForm;

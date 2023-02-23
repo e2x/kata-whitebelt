@@ -38,7 +38,9 @@ export default function Resources() {
     servicesData();
   }, []);
 
-  //const services = await servicesData;
+  useEffect(() => {
+    document.title = metadata.title
+  }, []);
 
   return (
       <>

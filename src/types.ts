@@ -16,3 +16,25 @@ export type IStatsType = {
   value: number
 }
 
+
+export type ApplicationCreateState = {
+  applicationName: string | undefined,
+  applicationDescription: string | undefined,
+  sourceRepositoryUrl: string,
+  gitUsername: string,
+  selectedServices: string[]
+}
+
+export enum GenerationType {
+  FE = "fe",
+  BE = "be",
+  LAMBDA = "lambda"
+}
+
+export type ServiceState = {
+  serviceName: string,
+  serviceSpecification: string,
+  serviceTargetName: string,
+  serviceGenerationType: GenerationType,
+  uploadedYaml: string
+}

@@ -7,6 +7,7 @@ import {INavigation, IUserNavigation, IStatsType} from "@/types";
 import Announcements from "@/components/Announcements";
 import Card from "@/components/Card";
 import WelcomePanel from "@/components/WelcomePanel";
+import ApplicationMetaDataForm from "@/app/create/ApplicationMetaDataForm";
 
 
 export const metadata = {
@@ -38,7 +39,9 @@ export default function Resources() {
     servicesData();
   }, []);
 
-  //const services = await servicesData;
+  useEffect(() => {
+    document.title = metadata.title
+  }, []);
 
   return (
       <>
@@ -53,16 +56,7 @@ export default function Resources() {
                 <div className="grid grid-cols-1 gap-4 lg:col-span-2">
                   <WelcomePanel stats={stats} />
                   <section>
-                    <Card
-                        imageUrl={"https://images.unsplash.com/photo-1525130413817-d45c1d127c42?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1920&q=60&blend=6366F1&sat=-100&blend-mode=multiply"}
-                        title={"Implemented KATA Services"}
-                        subtitle={"We’re here to help"}
-                        data={services && services?.services?.map((s: { service: string }) => {
-                          console.log(s.service)
-                          return <div key={s.service}>{s.service}</div>
-                        })}
-                    />
-
+                    <ApplicationMetaDataForm />
                   </section>
                 </div>
                 <div className="grid grid-cols-1 gap-4">

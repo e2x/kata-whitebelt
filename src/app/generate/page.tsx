@@ -6,6 +6,7 @@ import {INavigation, IUserNavigation, IStatsType} from "@/types";
 import Announcements from "@/components/Announcements";
 import GenerateServiceForm from "@/app/generate/GenerateServiceForm";
 import WelcomePanel from "@/components/WelcomePanel";
+import {useEffect} from "react";
 
 
 export const metadata = {
@@ -28,6 +29,10 @@ const stats: IStatsType[] = [
 ]
 
 export default function Resources() {
+
+  useEffect(() => {
+    document.title = metadata.title
+  }, []);
 
   return (
       <>

@@ -1,9 +1,10 @@
 'use client';
 
 import './globals.css'
+import KataHead from "@/app/kataHead";
 
 export const metadata = {
-  title: 'KATA Whitebelt | Resources',
+  title: 'KATA Whitebelt',
   description: 'Welcome to KATA Whitebelt',
   navigation: [],
   userNavigation: [],
@@ -24,7 +25,7 @@ export default function RootLayout({
         <head /> will contain the components returned by the nearest parent
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
-      <head />
+      <KataHead />
       <body className="h-full">
         {children}
       </body>

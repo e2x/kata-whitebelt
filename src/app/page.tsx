@@ -9,7 +9,7 @@ import FeatureCard from "@/components/FeatureCard";
 import CreateLottie from '@/components/lottie/Create';
 import GenerateLottie from '@/components/lottie/Generate';
 import SettingsLottie from '@/components/lottie/Settings';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import WelcomePanel from "@/components/WelcomePanel";
 
 export const metadata = {
@@ -35,6 +35,10 @@ export default function Home() {
   const [playCreate, setPlayCreate] = useState<boolean>(false);
   const [playGenerate, setPlayGenerate] = useState<boolean>(false);
   const [playSettings, setPlaySettings] = useState<boolean>(false);
+
+  useEffect(() => {
+    document.title = metadata.title
+  }, []);
 
   return (
       <>
@@ -130,4 +134,8 @@ export default function Home() {
         </div>
       </>
   )
+}
+
+export async function generateMetadata() {
+  return { title: 'KATA Whitebelt' };
 }
