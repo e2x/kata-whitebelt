@@ -135,7 +135,3 @@ export default function Home() {
       </>
   )
 }
-
-export async function generateMetadata() {
-  return { title: 'KATA Whitebelt' };
-}
